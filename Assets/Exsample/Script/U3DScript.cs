@@ -15,6 +15,7 @@ public class U3DScript : MonoBehaviour
     private void Awake()
     {
         _env = new LuaEnv();
+        //必须在 new完虚拟机后调用这个函数
 #if UNITY_EDITOR
         MikuLuaProfiler.LuaProfiler.SetMainLuaEnv(_env);
 #endif
