@@ -146,7 +146,6 @@ namespace MikuLuaProfiler
                 {
                     UnityEditor.EditorApplication.isPlaying = false;
                 }
-                Debug.Log("complete");
             }
             catch (Exception e)
             {
