@@ -39,10 +39,6 @@ namespace MikuLuaProfiler
                 LuaProfiler.SetMainLuaEnv(null);
                 Uninstall();
             }
-            else if (playModeStateChange == PlayModeStateChange.EnteredPlayMode)
-            {
-                HookLuaFuns();
-            }
         }
 
         #region hook
@@ -522,6 +518,7 @@ namespace MikuLuaProfiler
         public static void SetMainLuaEnv(LuaEnv env)
         {
             _mainEnv = env;
+            HookSetup.HookLuaFuns();
         }
 
         public static string GetLuaMemory()

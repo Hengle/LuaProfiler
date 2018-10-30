@@ -311,6 +311,8 @@ namespace MikuLuaProfiler
 
         public bool Check()
         {
+            return true;
+            /*
             ResetConfig();
             ClearConsole();
             StringBuilder sb = new StringBuilder();
@@ -325,7 +327,7 @@ namespace MikuLuaProfiler
                 UnityEngine.Debug.Log("<color=#00ff00>Check OK</color>");
             }
 
-            return checkResult;
+            return checkResult;*/
         }
 
         public static bool ProcessCommand(string argument)

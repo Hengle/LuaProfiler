@@ -21,13 +21,11 @@ public class U3DScript : MonoBehaviour
     }
     void Start()
     {
-        StartCoroutine(StartLua());
+        StartLua();
     }
 
-    IEnumerator StartLua()
+    void StartLua()
     {
-        yield return null;
-        yield return null;
         _env.AddLoader(CustomLoader);
 
         main = Require("main");

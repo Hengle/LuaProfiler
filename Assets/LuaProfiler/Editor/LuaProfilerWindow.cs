@@ -162,7 +162,7 @@ namespace MikuLuaProfiler
         }
 
         // Add menu named "My Window" to the Window menu
-        [MenuItem("Tools/程序/LuaProfiler/Profiler Window")]
+        [MenuItem("Window/Lua Profiler Window")]
         static public void ShowWindow()
         {
             // Get existing open window or if none, make a new one:
