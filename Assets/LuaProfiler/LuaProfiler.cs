@@ -24,11 +24,6 @@ namespace MikuLuaProfiler
     {
         static HookSetup()
         {
-            if (LuaDeepProfilerSetting.Instance.isDeepProfiler)
-            {
-                LuaDeepProfiler.Start(true);
-            }
-            //HookLuaFuns();
             EditorApplication.playModeStateChanged += OnEditorPlaying;
         }
 
@@ -219,6 +214,27 @@ namespace MikuLuaProfiler
             }
             #endregion
 
+            public static int xluaL_loadbuffer(IntPtr L, byte[] buff, int size, string name)
+            {
+                if (LuaDeepProfilerSetting.Instance.isDeepProfiler && name != "chunk")
+                {
+                    var utf8WithoutBom = new System.Text.UTF8Encoding(true);
+                    string fileName = name.Substring(1, name.Length - 1).Replace("/", ".") + LuaDeepProfilerSetting.Instance.luaExtern;
+                    string value = utf8WithoutBom.GetString(buff);
+                    value = LuaDeepProfiler.InsertSample(value, fileName);
+
+                    buff = utf8WithoutBom.GetBytes(value);
+                    size = buff.Length;
+                }
+
+                return ProxyLoadbuffer(L, buff, size, name);
+            }
+
+            public static int ProxyLoadbuffer(IntPtr L, byte[] buff, int size, string name)
+            {
+                return 0;
+            }
+
             public static string lua_tostring(IntPtr L, int index)
             {
                 IntPtr strlen;
@@ -269,6 +285,8 @@ namespace MikuLuaProfiler
         #region hook loader
         public class LuaLoader
         {
+
+            #region output mode
             private static bool m_isInited = false;
             private static readonly Dictionary<string, string> m_pathDict = new Dictionary<string, string>();
             private static void InitPathDict()
@@ -351,7 +369,9 @@ namespace MikuLuaProfiler
             {
 
             }
+            #endregion
         }
+
         #endregion
 
         #region hook profiler
@@ -422,26 +442,33 @@ namespace MikuLuaProfiler
 
                 tostringHook = new MethodHooker(tostringFun, tostringReplace, tostringProxy);
                 tostringHook.Install();
+
+                tostringFun = typeLog.GetMethod("xluaL_loadbuffer");
+                tostringReplace = typeLogReplace.GetMethod("xluaL_loadbuffer");
+                tostringProxy = typeLogReplace.GetMethod("ProxyLoadbuffer");
+
+                tostringHook = new MethodHooker(tostringFun, tostringReplace, tostringProxy);
+                tostringHook.Install();
             }
 
-            if (loaderHook == null)
-            {
-                Type typeLoadReplace = typeof(LuaLoader);
-                Type typeEnv = typeof(XLua.LuaEnv);
-                MethodInfo loaderFun = typeEnv.GetMethod("AddLoader");
-                MethodInfo loaderReplace = typeLoadReplace.GetMethod("AddLoader");
-                MethodInfo loaderProxy = typeLoadReplace.GetMethod("Proxy");
+            //if (loaderHook == null)
+            //{
+            //    Type typeLoadReplace = typeof(LuaLoader);
+            //    Type typeEnv = typeof(XLua.LuaEnv);
+            //    MethodInfo loaderFun = typeEnv.GetMethod("AddLoader");
+            //    MethodInfo loaderReplace = typeLoadReplace.GetMethod("AddLoader");
+            //    MethodInfo loaderProxy = typeLoadReplace.GetMethod("Proxy");
 
-                loaderHook = new MethodHooker(loaderFun, loaderReplace, loaderProxy);
-                loaderHook.Install();
+            //    loaderHook = new MethodHooker(loaderFun, loaderReplace, loaderProxy);
+            //    loaderHook.Install();
 
-                MethodInfo searchFun = typeEnv.GetMethod("AddSearcher", BindingFlags.NonPublic | BindingFlags.Instance);
-                MethodInfo searchReplace = typeLoadReplace.GetMethod("AddSearcher", BindingFlags.Public | BindingFlags.Static);
-                MethodInfo searchProxy = typeLoadReplace.GetMethod("ProxySearcher", BindingFlags.Public | BindingFlags.Static);
+            //    MethodInfo searchFun = typeEnv.GetMethod("AddSearcher", BindingFlags.NonPublic | BindingFlags.Instance);
+            //    MethodInfo searchReplace = typeLoadReplace.GetMethod("AddSearcher", BindingFlags.Public | BindingFlags.Static);
+            //    MethodInfo searchProxy = typeLoadReplace.GetMethod("ProxySearcher", BindingFlags.Public | BindingFlags.Static);
 
-                loaderHook = new MethodHooker(searchFun, searchReplace, searchProxy);
-                loaderHook.Install();
-            }
+            //    loaderHook = new MethodHooker(searchFun, searchReplace, searchProxy);
+            //    loaderHook.Install();
+            //}
 
             if (beginSampeOnly == null)
             {
@@ -568,57 +595,80 @@ end
                 s.name = name;
                 s.costTime = 0;
                 s.childs.Clear();
-                s.mirrorList.Clear();
                 s._father = null;
+                s._fullName = null;
 
                 return s;
             }
 
-            public void Restore(bool isMirror = false)
+            public void Restore()
             {
-                for (int i = 0, imax = mirrorList.Count; i < imax; i++)
+                for (int i = 0, imax = childs.Count; i < imax; i++)
                 {
-                    mirrorList[i].Restore(true);
+                    childs[i].Restore();
                 }
-                if (!isMirror)
-                {
-                    for (int i = 0, imax = childs.Count; i < imax; i++)
-                    {
-                        childs[i].Restore();
-                    }
-                }
-                childs.Clear();
-                mirrorList.Clear();
                 samplePool.Store(this);
             }
 
-            public bool Compare(Sample sample)
-            {
-                if (sample == null) return false;
-                if (this == sample) return true;
-                if (_father.name != sample._father.name) return false;
-                if (this.name != sample.name) return false;
-                if (this.childs.Count != sample.childs.Count) return false;
-                for (int i = 0, imax = sample.childs.Count; i < imax; i++)
-                {
-                    var item = sample.childs[i];
-                    if (!this.childs[i].Compare(item))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
             public int oneFrameCall
             {
                 get
                 {
-                    return 1 + mirrorList.Count;
+                    return 1;
                 }
             }
             public float currentTime { private set; get; }
             public long realCurrentLuaMemory { private set; get; }
-            public string name { private set; get; }
+            private string _name;
+            public string name {
+                private set
+                {
+                    _name = value;
+                }
+                get
+                {
+                    return _name;
+                }
+            }
+
+            private static Dictionary<string, Dictionary<string, string>> m_fullNamePool = new Dictionary<string, Dictionary<string, string>>();
+            private string _fullName = null;
+            public string fullName
+            {
+                get
+                {
+                    if (_father == null) return _name;
+
+                    if (_fullName == null)
+                    {
+                        Dictionary<string, string> childDict;
+                        if (!m_fullNamePool.TryGetValue(_father.fullName, out childDict))
+                        {
+                            childDict = new Dictionary<string, string>();
+                            m_fullNamePool.Add(_father.fullName, childDict);
+                        }
+
+                        if (!childDict.TryGetValue(_name, out _fullName))
+                        {
+                            string value = _name;
+                            var f = _father;
+                            while (f != null)
+                            {
+                                value = f.name + value;
+                                f = f.fahter;
+                            }
+                            _fullName = value;
+                            childDict[_name] = _fullName;
+                        }
+
+                        return _fullName;
+                    }
+                    else
+                    {
+                        return _fullName;
+                    }
+                }
+            }
             //这玩意在统计的window里面没啥卵用
             public long currentLuaMemory { set; get; }
 
@@ -632,10 +682,6 @@ end
                 get
                 {
                     float result = _costTime;
-                    for (int i = 0, imax = mirrorList.Count; i < imax; i++)
-                    {
-                        result += mirrorList[i]._costTime;
-                    }
                     return result;
                 }
             }
@@ -649,12 +695,7 @@ end
                 }
                 get
                 {
-                    long result = _costGC;
-                    for (int i = 0, imax = mirrorList.Count; i < imax; i++)
-                    {
-                        result += mirrorList[i]._costGC;
-                    }
-                    return result;
+                    return _costGC;
                 }
             }
             private Sample _father;
@@ -665,23 +706,7 @@ end
                     _father = value;
                     if (_father != null)
                     {
-                        bool needAdd = true;
-                        for (int i = 0, imax = _father.childs.Count; i < imax; i++)
-                        {
-                            var item = _father.childs[i];
-                            if (item.Compare(this) && item != this)
-                            {
-                                needAdd = false;
-                                item.AddMirror(this);
-                                return;
-                            }
-                        }
-                        if (needAdd)
-                        {
-                            _father.childs.Add(this);
-                        }
-
-                        //SetSliberMirror(_father.fahter, this.fahter);
+                        _father.childs.Add(this);
                     }
                 }
                 get
@@ -690,37 +715,6 @@ end
                 }
             }
 
-            private static void SetSliberMirror(Sample father, Sample node)
-            {
-                if (father == null) return;
-                bool needAdd = true;
-                for (int i = 0, imax = father.childs.Count; i < imax; i++)
-                {
-                    var item = father.childs[i];
-                    if (item.Compare(node) && item != node)
-                    {
-                        needAdd = false;
-                        item.AddMirror(node);
-                        if (father.childs.Contains(node))
-                        {
-                            father.childs.Remove(node);
-                        }
-                        return;
-                    }
-                }
-                SetSliberMirror(father.fahter, node.fahter);
-            }
-
-            private void AddMirror(Sample s)
-            {
-                mirrorList.Add(s);
-                for (int i = 0, imax = childs.Count; i < imax; i++)
-                {
-                    childs[i].AddMirror(s.childs[i]);
-                }
-            }
-            //如果不为空，这个Sample在统计上会被合并到_mirror中
-            public readonly List<Sample> mirrorList = new List<Sample>();
             public readonly List<Sample> childs = new List<Sample>();
         }
         //开始采样时候的lua内存情况，因为中间有可能会有二次采样，所以要丢到一个盏中
@@ -728,7 +722,7 @@ end
 
         private static Action<Sample> m_SampleEndAction;
 
-        private static bool _stableGC = false;
+        private static bool _stableGC = true;
         public static bool stableGC
         {
             get { return _stableGC; }

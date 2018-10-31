@@ -198,7 +198,7 @@ namespace MikuLuaProfiler
         #endregion
 
         #region parse
-        static string InsertSample(string value, string name)
+        public static string InsertSample(string value, string name)
         {
             LLex l = new LLex(new StringLoadInfo(value), name);
             l.InsertString(0, "BeginMikuSample(\"protoc.lua, line:1 require file\")");
@@ -295,7 +295,7 @@ namespace MikuLuaProfiler
                                 tokenType = l.Token.TokenType;
                             }
 
-                            if (tokenType == (int)TK.END || tokenType == (int)TK.ELSEIF || tokenType == (int)TK.ELSE)
+                            if (tokenType == (int)TK.END || tokenType == (int)TK.ELSEIF || tokenType == (int)TK.ELSE || tokenType == (int)TK.EOS)
                             {
                                 string returnStr = l.ReadString(insertPos, lastPos - 1);;
 

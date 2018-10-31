@@ -50,8 +50,13 @@ namespace MikuLuaProfiler
         private static ObjectPool<LuaProfilerTreeViewItem> objectPool = new ObjectPool<LuaProfilerTreeViewItem>(30);
         public static LuaProfilerTreeViewItem Create(LuaProfiler.Sample sample, int depth, LuaProfilerTreeViewItem father)
         {
-            LuaProfilerTreeViewItem mt = objectPool.GetObject();
+            var dict = LuaProfilerTreeView.m_nodeDict;
+
+            LuaProfilerTreeViewItem mt;
+            mt = objectPool.GetObject();
             mt.ResetBySample(sample, depth, father);
+            dict.Add(mt.fullName, mt);
+
             return mt;
         }
         public void Restore()
@@ -80,30 +85,19 @@ namespace MikuLuaProfiler
         public long averageTime { private set; get; }
         public float currentTime { private set; get; }
         public int totalCallTime { private set; get; }
+
+        public string fullName
+        {
+            get;
+            private set;
+        }
         public readonly List<LuaProfilerTreeViewItem> childs = new List<LuaProfilerTreeViewItem>();
         public LuaProfilerTreeViewItem father { private set; get; }
         private int _frameCount;
         public LuaProfilerTreeViewItem()
         {
         }
-        public bool Compare(LuaProfiler.Sample sample)
-        {
-            if (sample == null) return false;
-            if (this.father == null && sample.fahter != null) return false;
-            if (this.father != null && sample.fahter == null) return false;
-            if (this.father != null && sample.fahter != null && this.father.displayName != sample.fahter.name) return false;
-            if (this.displayName != sample.name) return false;
-            if (this.childs.Count != sample.childs.Count) return false;
-            for (int i = 0, imax = sample.childs.Count; i < imax; i++)
-            {
-                var item = sample.childs[i];
-                if (!this.childs[i].Compare(item))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
+
         public void ResetBySample(LuaProfiler.Sample sample, int depth, LuaProfilerTreeViewItem father)
         {
             if (sample != null)
@@ -111,12 +105,14 @@ namespace MikuLuaProfiler
                 totalMemory = sample.costGC;
                 totalTime = (long)(sample.costTime * 1000000);
                 displayName = sample.name;
+                fullName = sample.fullName;
             }
             else
             {
                 totalMemory = 0;
                 totalTime = 0;
                 displayName = "root";
+                fullName = "root";
             }
             totalCallTime = 1;
             averageTime = totalTime / totalCallTime;
@@ -130,8 +126,19 @@ namespace MikuLuaProfiler
             {
                 for (int i = 0, imax = sample.childs.Count; i < imax; i++)
                 {
-                    var item = Create(sample.childs[i], depth + 1, this);
-                    childs.Add(item);
+                    var dict = LuaProfilerTreeView.m_nodeDict;
+
+                    LuaProfilerTreeViewItem mt;
+                    var childSample = sample.childs[i];
+                    if (dict.TryGetValue(childSample.fullName, out mt))
+                    {
+                        mt.AddSample(childSample);
+                    }
+                    else
+                    {
+                        var item = Create(sample.childs[i], depth + 1, this);
+                        childs.Add(item);
+                    }
                 }
             }
             this.father = father;
@@ -162,7 +169,17 @@ namespace MikuLuaProfiler
             averageTime = totalTime / totalCallTime;
             for (int i = 0, imax = sample.childs.Count; i < imax; i++)
             {
-                childs[i].AddSample(sample.childs[i]);
+                LuaProfilerTreeViewItem childItem = null;
+                var sampleChild = sample.childs[i];
+                if (LuaProfilerTreeView.m_nodeDict.TryGetValue(sampleChild.fullName, out childItem))
+                {
+                    childItem.AddSample(sampleChild);
+                }
+                else
+                {
+                    var treeItem = Create(sampleChild, depth + 1, this);
+                    childs.Add(treeItem);
+                }
             }
             //以下代码只不过为了 gc的显示数值不闪烁
             if (_gc[0] == _gc[1] || _gc[0] == _gc[2] || _gc[0] == _gc[3])
@@ -335,6 +352,7 @@ namespace MikuLuaProfiler
         public void Clear()
         {
             roots.Clear();
+            m_nodeDict.Clear();
             treeViewItems.Clear();
         }
 
@@ -354,19 +372,22 @@ namespace MikuLuaProfiler
             }
         }
 
+        public static Dictionary<string, LuaProfilerTreeViewItem> m_nodeDict = new Dictionary<string, LuaProfilerTreeViewItem>();
+
         private void LoadRootSample(LuaProfiler.Sample sample)
         {
-            string name = sample.name;
-            for (int i = 0, imax = roots.Count; i < imax; i++)
+            LuaProfilerTreeViewItem item;
+            string f = sample.fullName;
+            string f1 = sample.fullName;
+            if (m_nodeDict.TryGetValue(sample.fullName, out item))
             {
-                var item = roots[i];
-                if (item.Compare(sample))
-                {
-                    item.AddSample(sample);
-                    return;
-                }
+                item.AddSample(sample);
             }
-            roots.Add(LuaProfilerTreeViewItem.Create(sample, 0, null));
+            else
+            {
+                item = LuaProfilerTreeViewItem.Create(sample, 0, null);
+                roots.Add(item);
+            }
         }
 
         private void ReLoadTreeItems()
@@ -398,6 +419,8 @@ namespace MikuLuaProfiler
         private void AddOneNode(LuaProfilerTreeViewItem root)
         {
             treeViewItems.Add(root);
+            
+            m_nodeDict[root.fullName] = root;
             if (root.children != null)
             {
                 root.children.Clear();
