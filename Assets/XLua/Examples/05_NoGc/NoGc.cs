@@ -70,8 +70,7 @@ namespace XLuaTest
     [LuaCallCSharp]
     public class NoGc : MonoBehaviour
     {
-        LuaEnv luaenv = new LuaEnv();
-
+        LuaEnv luaenv;
         IntParam f1;
         Vector3Param f2;
         CustomValueTypeParam f3;
@@ -122,6 +121,7 @@ namespace XLuaTest
         // Use this for initialization
         void Start()
         {
+            luaenv = new LuaEnv();
             luaenv.DoString(@"
                 function id(...)
                     return ...

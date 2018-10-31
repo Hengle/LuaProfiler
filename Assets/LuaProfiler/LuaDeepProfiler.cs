@@ -201,14 +201,14 @@ namespace MikuLuaProfiler
         public static string InsertSample(string value, string name)
         {
             LLex l = new LLex(new StringLoadInfo(value), name);
-            l.InsertString(0, "BeginMikuSample(\"protoc.lua, line:1 require file\")");
+            l.InsertString(0, "BeginMikuSample(\"" + name +", line:1 require file\")");
             int lastPos = 0;
             int nextPos = l.pos;
             l.Next();
             int tokenType = l.Token.TokenType;
 
-            nextPos = l.pos;
             lastPos = nextPos;
+            nextPos = l.pos;
 
             InsertSample(l, ref lastPos, ref nextPos, tokenType, false);
 
@@ -278,7 +278,7 @@ namespace MikuLuaProfiler
                         }
                         break;
                     case (int)TK.RETURN:
-                        int insertPos = lastPos;
+                        int insertPos = lastPos - 1;
 
                         while (tokenType != (int)TK.EOS)
                         {

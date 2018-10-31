@@ -25,6 +25,7 @@ public static class Startup
 {
     private static MethodHooker clickhook;
     private static MethodHooker reflectionHook;
+    private static MethodHooker hookNewLuaEnv;
 
     public static readonly string luaPath;
     static Startup()
@@ -70,7 +71,8 @@ public static class Startup
     static void Update()
     {
         HookClick();
-        HookReflection();
+        //HookReflection();
+        HookNewLuaEnv();
     }
 
     public static void HookClick()
@@ -84,6 +86,37 @@ public static class Startup
             MethodInfo clickProxy = typeLogReplace.GetMethod("Proxy", BindingFlags.Public | BindingFlags.Static);
             clickhook = new MethodHooker(clickFun, clickReplace, clickProxy);
             clickhook.Install();
+        }
+    }
+
+    public static void HookNewLuaEnv()
+    {
+        if (hookNewLuaEnv == null)
+        {
+            Type envReplace = typeof(LuaEnvReplace);
+            Type typeEnv = typeof(XLua.LuaEnv);
+            var clickFun = typeEnv.GetConstructors()[0];
+            MethodInfo clickReplace = envReplace.GetMethod("Ctor");
+            MethodInfo clickProxy = envReplace.GetMethod("Proxy", BindingFlags.Public | BindingFlags.Static);
+            hookNewLuaEnv = new MethodHooker(clickFun, clickReplace, clickProxy); 
+
+            hookNewLuaEnv.Install();
+        }
+    }
+
+    public static class LuaEnvReplace
+    {
+        public static XLua.LuaEnv Ctor(XLua.LuaEnv env)
+        {
+            var result = Proxy(env);
+
+            MikuLuaProfiler.LuaProfiler.SetMainLuaEnv(env);
+
+            return result;
+        }
+        public static XLua.LuaEnv Proxy(XLua.LuaEnv env)
+        {
+            return null;
         }
     }
 

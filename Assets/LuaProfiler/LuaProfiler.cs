@@ -216,10 +216,10 @@ namespace MikuLuaProfiler
 
             public static int xluaL_loadbuffer(IntPtr L, byte[] buff, int size, string name)
             {
-                if (LuaDeepProfilerSetting.Instance.isDeepProfiler && name != "chunk")
+                if (LuaDeepProfilerSetting.Instance.isDeepProfiler)//&& name != "chunk"
                 {
                     var utf8WithoutBom = new System.Text.UTF8Encoding(true);
-                    string fileName = name.Substring(1, name.Length - 1).Replace("/", ".") + LuaDeepProfilerSetting.Instance.luaExtern;
+                    string fileName = name.Replace("@", "").Replace("/", ".") + LuaDeepProfilerSetting.Instance.luaExtern;
                     string value = utf8WithoutBom.GetString(buff);
                     value = LuaDeepProfiler.InsertSample(value, fileName);
 
@@ -545,9 +545,11 @@ namespace MikuLuaProfiler
         public static void SetMainLuaEnv(LuaEnv env)
         {
             _mainEnv = env;
-            if (env != null)
+            if (LuaDeepProfilerSetting.Instance.isDeepProfiler)
             {
-                env.DoString(@"
+                if (env != null)
+                {
+                    env.DoString(@"
 BeginMikuSample = CS.MikuLuaProfiler.LuaProfiler.BeginSample
 EndMikuSample = CS.MikuLuaProfiler.LuaProfiler.EndSample
 
@@ -556,9 +558,9 @@ function miku_unpack_return_value(...)
 	return ...
 end
 ");
+                    HookSetup.HookLuaFuns();
+                }
             }
-
-            HookSetup.HookLuaFuns();
         }
 
         public static string GetLuaMemory()

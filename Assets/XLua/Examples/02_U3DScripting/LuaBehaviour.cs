@@ -24,7 +24,7 @@ public class LuaBehaviour : MonoBehaviour {
     public TextAsset luaScript;
     public Injection[] injections;
 
-    internal static LuaEnv luaEnv = new LuaEnv(); //all lua behaviour shared one luaenv only!
+    internal static LuaEnv luaEnv; //all lua behaviour shared one luaenv only!
     internal static float lastGCTime = 0;
     internal const float GCInterval = 1;//1 second 
 
@@ -36,6 +36,7 @@ public class LuaBehaviour : MonoBehaviour {
 
     void Awake()
     {
+        luaEnv = new LuaEnv();
         scriptEnv = luaEnv.NewTable();
 
         // 为每个脚本设置一个独立的环境，可一定程度上防止脚本间全局变量、函数冲突
