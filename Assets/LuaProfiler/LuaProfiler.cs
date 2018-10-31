@@ -518,6 +518,19 @@ namespace MikuLuaProfiler
         public static void SetMainLuaEnv(LuaEnv env)
         {
             _mainEnv = env;
+            if (env != null)
+            {
+                env.DoString(@"
+BeginMikuSample = CS.MikuLuaProfiler.LuaProfiler.BeginSample
+EndMikuSample = CS.MikuLuaProfiler.LuaProfiler.EndSample
+
+function miku_unpack_return_value(...)
+	EndMikuSample()
+	return ...
+end
+");
+            }
+
             HookSetup.HookLuaFuns();
         }
 

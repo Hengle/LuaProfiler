@@ -66,7 +66,7 @@ public class LocalToLuaIDE : Editor {
     public static bool OnOpenAsset(string file, int line) {
         string filePath = file;
 
-        string luaFolderRoot = "Lua";//Startup.luaPath;
+        string luaFolderRoot = MikuLuaProfiler.LuaDeepProfilerSetting.Instance.luaProjectPath;
         filePath = luaFolderRoot.Trim() + filePath.Trim();//+ ".lua";
 
         return OpenFileAtLineExternal(filePath, line);

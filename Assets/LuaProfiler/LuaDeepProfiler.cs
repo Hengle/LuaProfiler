@@ -200,13 +200,8 @@ namespace MikuLuaProfiler
         #region parse
         static string InsertSample(string value, string name)
         {
-            string localValue = "local BeginMikuSample = CS.MikuLuaProfiler.LuaProfiler.BeginSample\r\n" +
-                "local EndMikuSample = CS.MikuLuaProfiler.LuaProfiler.EndSample\r\n" +
-                "BeginMikuSample(\"" + name + ".lua,line:1" + " funName:require" + name + "\")\r\n";
-
             LLex l = new LLex(new StringLoadInfo(value), name);
-            l.InsertString(0, localValue);
-
+            l.InsertString(0, "BeginMikuSample(\"protoc.lua, line:1 require file\")");
             int lastPos = 0;
             int nextPos = l.pos;
             l.Next();
@@ -267,7 +262,7 @@ namespace MikuLuaProfiler
 
                             if (tokenType == (int)')')
                             {
-                                l.InsertString(nextPos, "\r\nBeginMikuSample(\"" + l.Source + ".lua,line:" + l.LineNumber + " funName:" + funName + "\")\r\n");
+                                l.InsertString(nextPos, "\r\nBeginMikuSample(\"" + l.Source + ",line:" + l.LineNumber + " funName:" + funName + "\")\r\n");
                                 nextPos = l.pos;
                                 break;
                             }
@@ -284,17 +279,11 @@ namespace MikuLuaProfiler
                         break;
                     case (int)TK.RETURN:
                         int insertPos = lastPos;
-                        int tokenCount = 0;
-                        bool isReturnCallFun = false;
-                        bool isReturnTable = false;
-                        int returnCount = 1;
 
-                        List<Token> tokenList = new List<Token>();
                         while (tokenType != (int)TK.EOS)
                         {
                             l.Next();
 
-                            tokenList.Add(l.Token);
                             tokenType = l.Token.TokenType;
 
                             lastPos = nextPos;
@@ -306,71 +295,17 @@ namespace MikuLuaProfiler
                                 tokenType = l.Token.TokenType;
                             }
 
-                            if (tokenType == (int)',' && !isReturnTable)
-                            {
-                                returnCount++;
-                            }
-
-                            if ( tokenType == (int)'{')
-                            {
-                                isReturnTable = true;
-                            }
-
-
-                            if (tokenType == (int)'(')
-                            {
-                                isReturnCallFun = true;
-                            }
-
                             if (tokenType == (int)TK.END || tokenType == (int)TK.ELSEIF || tokenType == (int)TK.ELSE)
                             {
-                                string returnStr = l.ReadString(insertPos, lastPos - 1);
-                                string returnValue = "";
+                                string returnStr = l.ReadString(insertPos, lastPos - 1);;
 
-                                if (tokenCount > 0)
-                                {
-                                    if (tokenList[tokenList.Count - 2] is StringToken)
-                                    {
-                                        isReturnCallFun = true;
-                                        for (int i = 0, imax = tokenList.Count - 2; i < imax; i++)
-                                        {
-                                            Token t = tokenList[i];
-                                            if (!(t is NameToken || t.TokenType == (int)'.' || t.TokenType == (int)':'))
-                                            {
-                                                isReturnCallFun = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-
-                                    if(isReturnCallFun)
-                                    {
-                                        returnCount = 10;
-                                    }
-
-                                    for (int i = 0; i < returnCount; i++)
-                                    {
-                                        returnValue += "MIKU_RETURN_VALUE" + i;
-                                        if (i != returnCount - 1)
-                                        {
-                                            returnValue += ",";
-                                        }
-                                    }
-                                    returnStr = returnStr.Trim();
-                                    returnStr = "\r\nlocal " + returnValue + " =" + returnStr.Substring(6, returnStr.Length - 6);
-                                    returnStr += "\r\nEndMikuSample()" + "\r\nreturn " + returnValue + "\r\n";
-                                }
-                                else
-                                {
-                                    returnStr = "\r\nEndMikuSample()\r\n" + returnStr + "\r\n";
-                                }
+                                returnStr = returnStr.Trim();
+                                returnStr = "\r\nreturn miku_unpack_return_value(" + returnStr.Substring(6, returnStr.Length - 6) + ")\r\n";
 
                                 l.Replace(insertPos, lastPos - 1, returnStr);
                                 nextPos = l.pos;
                                 break;
                             }
-
-                            tokenCount++;
                         }
 
                         if (lastStackToken != (int)TK.IF)
