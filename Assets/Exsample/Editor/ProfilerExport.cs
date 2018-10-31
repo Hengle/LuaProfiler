@@ -5,7 +5,7 @@ using XLua;
 
 namespace MikuLuaProfiler
 {
-    class LuaExport
+    public static class LuaExport
     {
         [LuaCallCSharp]
         public static List<Type> LuaCallCSharpTypes = new List<Type>() {
@@ -15,7 +15,8 @@ namespace MikuLuaProfiler
             typeof(LuaProfiler.Sample),
             typeof(List<LuaProfiler.Sample>),
             typeof(LuaProfiler),
-            typeof(UnityEngine.Debug)
+            typeof(UnityEngine.Debug),
+            typeof(UnityEngine.Light)
         };
     }
 
