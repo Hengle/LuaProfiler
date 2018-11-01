@@ -81,10 +81,6 @@ namespace MikuLuaProfiler
             bool flag = GUILayout.Toggle(LuaDeepProfilerSetting.Instance.isDeepProfiler, "Deep Profiler", EditorStyles.toolbarButton, GUILayout.Height(30));
             if (flag != LuaDeepProfilerSetting.Instance.isDeepProfiler)
             {
-                if (flag)
-                {
-                    LuaDeepProfiler.Start();
-                }
                 LuaDeepProfilerSetting.Instance.isDeepProfiler = flag;
                 EditorUtility.SetDirty(LuaDeepProfilerSetting.Instance);
                 AssetDatabase.SaveAssets();
