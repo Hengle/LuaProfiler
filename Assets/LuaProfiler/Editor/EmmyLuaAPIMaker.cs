@@ -31,7 +31,7 @@ static public class EmmyLuaAPIMaker
     #endregion
 
     #region menu
-    [MenuItem("Tools/Generate Emmy API")]
+    //[MenuItem("Tools/Generate Emmy API")]
     public static void GenAll()
     {
         GenWaperAPI();

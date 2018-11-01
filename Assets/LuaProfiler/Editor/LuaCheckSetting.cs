@@ -60,7 +60,7 @@ namespace MikuLuaProfiler
         #endregion
 
         #region check
-        [MenuItem("Tools/LuaCheck", priority = 11)]
+        //[MenuItem("Tools/LuaCheck", priority = 11)]
         public static void EditSettings()
         {
             Selection.activeObject = Instance;

@@ -97,7 +97,7 @@ namespace MikuLuaProfiler
 
 #if UNITY_EDITOR
 
-        [MenuItem("Tools/LuaProfilerSetting", priority = 10)]
+        //[MenuItem("Tools/LuaProfilerSetting", priority = 10)]
         public static void EditSettings()
         {
             Selection.activeObject = Instance;

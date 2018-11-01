@@ -104,7 +104,7 @@ public class LocalToLuaIDE : Editor {
         }
     }
 
-    [MenuItem("Tools/Lua IDE Setting", false, 15)]
+    //[MenuItem("Tools/Lua IDE Setting", false, 15)]
     static void SetExternalEditorPath() {
         string path = EditorUserSettings.GetConfigValue(EXTERNAL_EDITOR_PATH_KEY);
         path = EditorUtility.OpenFilePanel("Select Lua IDE", path, "exe");

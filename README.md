@@ -36,6 +36,7 @@ xLua在功能、性能、易用性都有不少突破，这几方面分别最具�
 * [XLua增加删除第三方lua库](Assets/XLua/Doc/XLua增加删除第三方lua库.md)：如何增删第三方lua扩展库。
 * [XLua API](Assets/XLua/Doc/XLua_API.md)：API文档。
 * [生成引擎二次开发指南](Assets/XLua/Doc/custom_generate.md)：介绍如何做生成引擎的二次开发。
+* [性能分析器使用文档](Assets/XLua/Doc/profile_use.md)：介绍如何使用性能分析器对lua代码进行性能分析。
 
 ## 快速入门
 
