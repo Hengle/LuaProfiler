@@ -39,3 +39,5 @@ build/luajit-2.1.0b2/src/luajit.lib
 /Assets/LuaDeepProfilerSettings.asset.meta
 /obj
 /Packages
+/Assets/LuaCheckSetting.asset.meta
+/Assets/LuaCheckSetting.asset
