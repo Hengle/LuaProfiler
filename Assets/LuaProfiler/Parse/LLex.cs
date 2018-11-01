@@ -164,6 +164,23 @@ namespace UniLua
         }
     }
 
+    public class CommentToken : Token
+    {
+        public CommentToken()
+        {
+        }
+
+        public override int TokenType
+        {
+            get { return -1; }
+        }
+
+        public override string ToString()
+        {
+            return "CommentToken";
+        }
+    }
+
     public class LiteralToken : Token
     {
         private int _Literal;
@@ -767,15 +784,15 @@ namespace UniLua
                             {
                                 _ReadLongString( sep );
                                 _ClearSaved();
-                                continue;
+                                return new CommentToken();
                             }
                         }
 
                         // else is a short comment
                         while( !_CurrentIsNewLine() && Current != EOZ )
                             _Next();
-                        continue;
-                    }
+                        return new CommentToken();
+                        }
 
                     case '[': {
                         int sep = _SkipSep();

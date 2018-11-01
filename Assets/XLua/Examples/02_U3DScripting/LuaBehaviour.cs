@@ -36,7 +36,11 @@ public class LuaBehaviour : MonoBehaviour {
 
     void Awake()
     {
-        luaEnv = new LuaEnv();
+        if (luaEnv == null)
+        {
+            luaEnv = new LuaEnv();
+        }
+
         scriptEnv = luaEnv.NewTable();
 
         // 为每个脚本设置一个独立的环境，可一定程度上防止脚本间全局变量、函数冲突
@@ -98,5 +102,17 @@ public class LuaBehaviour : MonoBehaviour {
         luaStart = null;
         scriptEnv.Dispose();
         injections = null;
+        if (luaEnv != null)
+        {
+            try
+            {
+                luaEnv.Dispose();
+            }
+            finally
+            {
+                luaEnv = null;
+            }
+
+        }
     }
 }

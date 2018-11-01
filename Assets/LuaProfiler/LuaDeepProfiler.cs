@@ -201,7 +201,7 @@ namespace MikuLuaProfiler
         public static string InsertSample(string value, string name)
         {
             LLex l = new LLex(new StringLoadInfo(value), name);
-            l.InsertString(0, "BeginMikuSample(\"" + name +", line:1 require file\")");
+            l.InsertString(0, "BeginMikuSample(\"" + name +", line:1 require file\")\r\n");
             int lastPos = 0;
             int nextPos = l.pos;
             l.Next();
@@ -219,6 +219,7 @@ namespace MikuLuaProfiler
         {
             Stack<int> tokens = new Stack<int>();
 
+            bool needLastSample = true;
             bool hasReturn = false;
             int lastStackToken = -1;
             while (tokenType != (int)TK.EOS)
@@ -280,6 +281,11 @@ namespace MikuLuaProfiler
                     case (int)TK.RETURN:
                         int insertPos = lastPos - 1;
 
+                        if (tokens.Count == 0)
+                        {
+                            needLastSample = false;
+                        }
+
                         while (tokenType != (int)TK.EOS)
                         {
                             l.Next();
@@ -295,15 +301,33 @@ namespace MikuLuaProfiler
                                 tokenType = l.Token.TokenType;
                             }
 
-                            if (tokenType == (int)TK.END || tokenType == (int)TK.ELSEIF || tokenType == (int)TK.ELSE || tokenType == (int)TK.EOS)
+                            if (tokenType == (int)TK.END
+                                || tokenType == (int)TK.ELSEIF 
+                                || tokenType == (int)TK.ELSE 
+                                || tokenType == (int)TK.EOS)
                             {
-                                string returnStr = l.ReadString(insertPos, lastPos - 1);;
+                                string returnStr = l.ReadString(insertPos, lastPos - 1); ;
 
                                 returnStr = returnStr.Trim();
                                 returnStr = "\r\nreturn miku_unpack_return_value(" + returnStr.Substring(6, returnStr.Length - 6) + ")\r\n";
 
                                 l.Replace(insertPos, lastPos - 1, returnStr);
                                 nextPos = l.pos;
+                                if (tokenType == (int)TK.END)
+                                {
+                                    if (onlyFun)
+                                    {
+                                        l.Next();
+                                        lastPos = nextPos;
+                                        nextPos = l.pos;
+                                        return;
+                                    }
+                                    else
+                                    {
+                                        tokens.Pop();
+                                    }
+            
+                                }
                                 break;
                             }
                         }
@@ -322,10 +346,14 @@ namespace MikuLuaProfiler
                                 if (!hasReturn)
                                 {
                                     l.InsertString(lastPos, "\r\nEndMikuSample()\r\n");
+                                    lastPos = nextPos;
                                     nextPos = l.pos;
                                 }
-                                if (onlyFun)
+                                if (onlyFun && tokens.Count <= 0)
                                 {
+                                    l.Next();
+                                    lastPos = nextPos;
+                                    nextPos = l.pos;
                                     return;
                                 }
                             }
@@ -342,6 +370,11 @@ namespace MikuLuaProfiler
                 tokenType = l.Token.TokenType;
                 lastPos = nextPos;
                 nextPos = l.pos;
+            }
+
+            if (needLastSample)
+            {
+                l.InsertString(nextPos, "\r\nEndMikuSample()");
             }
         }
         #endregion
