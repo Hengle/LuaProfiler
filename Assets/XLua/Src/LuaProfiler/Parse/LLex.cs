@@ -56,7 +56,7 @@ namespace UniLua
     {
         public StringLoadInfo(string s)
         {
-            Str = s;
+            Str = new StringBuilder(s);
             Pos = 0;
         }
 
@@ -89,7 +89,7 @@ namespace UniLua
 
         public string Replace(int start, int len, string value)
         {
-            string result = Str.Substring(start, len);
+            string result = Str.ToString().Substring(start, len);
             Str = Str.Remove(start, len);
             Str = Str.Insert(start, value);
             if ((start + len) <= Pos)
@@ -98,9 +98,15 @@ namespace UniLua
             }
             return result;
         }
-        public string ReadString(int startPos, int endPos)
+        public string ReadString(int startPos, int len)
         {
-            return Str.Substring(startPos, endPos - startPos + 1);
+            char[] chars = new char[len];
+            for (int i = 0, imax = len; i < imax; i++)
+            {
+                chars[i] = Str[i + startPos];
+            }
+
+            return new string(chars);
         }
 
         public void InsertString(int startPos, string value)
@@ -112,10 +118,10 @@ namespace UniLua
         {
             get
             {
-                return Str;
+                return Str.ToString();
             }
         }
-        private string Str;
+        private StringBuilder Str;
         public int Pos;
     }
 
@@ -377,7 +383,8 @@ namespace UniLua
 
         public string ReadString(int start, int end)
         {
-            return LoadInfo.ReadString(start, end);
+            int len = end - start + 1;
+            return LoadInfo.ReadString(start, len);
         }
 
         private void _Next()

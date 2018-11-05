@@ -8,7 +8,6 @@ using UnityEngine.Profiling;
 #endif
 using XLua;
 using LuaLib = XLua.LuaDLL.Lua;
-using LuaCSFunction = XLua.LuaDLL.lua_CSFunction;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Reflection;
