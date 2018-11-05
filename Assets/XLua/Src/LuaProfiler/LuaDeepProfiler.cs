@@ -227,6 +227,7 @@ namespace MikuLuaProfiler
                 switch (tokenType)
                 {
                     case (int)TK.FUNCTION:
+                        hasReturn = false;
                         tokens.Push(tokenType);
                         lastStackToken = tokenType;
                         string funName = "";
@@ -309,7 +310,7 @@ namespace MikuLuaProfiler
                                 string returnStr = l.ReadString(insertPos, lastPos - 1); ;
 
                                 returnStr = returnStr.Trim();
-                                returnStr = "\r\nreturn miku_unpack_return_value(" + returnStr.Substring(6, returnStr.Length - 6) + ")\r\n";
+                                returnStr = "\r\nreturn miku_unpack_return_value(" + returnStr.Substring(6, returnStr.Length - 6).Trim() + ")\r\n";
 
                                 l.Replace(insertPos, lastPos - 1, returnStr);
                                 nextPos = l.pos;
