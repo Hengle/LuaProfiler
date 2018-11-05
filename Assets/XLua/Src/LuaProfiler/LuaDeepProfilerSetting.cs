@@ -1,31 +1,4 @@
 ﻿/*
-               #########                       
-              ############                     
-              #############                    
-             ##  ###########                   
-            ###  ###### #####                  
-            ### #######   ####                 
-           ###  ########## ####                
-          ####  ########### ####               
-         ####   ###########  #####             
-        #####   ### ########   #####           
-       #####   ###   ########   ######         
-      ######   ###  ###########   ######       
-     ######   #### ##############  ######      
-    #######  #####################  ######     
-    #######  ######################  ######    
-   #######  ###### #################  ######   
-   #######  ###### ###### #########   ######   
-   #######    ##  ######   ######     ######   
-   #######        ######    #####     #####    
-    ######        #####     #####     ####     
-     #####        ####      #####     ###      
-      #####       ###        ###      #        
-        ###       ###        ###               
-         ##       ###        ###               
-__________#_______####_______####______________
-
-               我们的未来没有BUG                  
 * ==============================================================================
 * Filename: LuaDeepProfilerSetting
 * Created:  2018/7/13 14:29:22
@@ -43,23 +16,7 @@ namespace MikuLuaProfiler
 
     public class LuaDeepProfilerSetting : ScriptableObject
     {
-        public List<string> excludeFolder = new List<string>();
-        public List<string> excludeFile = new List<string>();
-
-        public string luaExtern = ".lua";
         public const string SettingsAssetName = "LuaDeepProfilerSettings";
-        [HideInInspector]
-        [SerializeField]
-        public string luaProjectPath = "Lua";
-
-
-        public string profilerLuaProjectPath
-        {
-            get
-            {
-                return luaProjectPath + "Profiler";
-            }
-        }
         private static LuaDeepProfilerSetting instance;
         public static LuaDeepProfilerSetting Instance
         {
@@ -92,10 +49,25 @@ namespace MikuLuaProfiler
             set
             {
                 m_isDeepProfiler = value;
+                EditorUtility.SetDirty(this);
             }
         }
 
-#if UNITY_EDITOR
+
+        [SerializeField]
+        private bool m_stableGC = true;
+        public bool stableGC
+        {
+            get
+            {
+                return m_stableGC;
+            }
+            set
+            {
+                m_stableGC = value;
+                EditorUtility.SetDirty(this);
+            }
+        }
 
         [MenuItem("Tools/LuaProfilerSetting", priority = 10)]
         public static void EditSettings()
@@ -108,42 +80,5 @@ namespace MikuLuaProfiler
 #endif
         }
 #endif
-
-        [SerializeField]
-        public List<string> keyList = new List<string>();
-        [SerializeField]
-        public List<string> md5List = new List<string>();
-        public void ReMakeDict()
-        {
-            md5Dict.Clear();
-            for (int i = 0, imax = keyList.Count; i < imax; i++)
-            {
-                md5Dict[keyList[i]] = md5List[i];
-            }
-            md5List.Clear();
-            keyList.Clear();
-        }
-        private Dictionary<string, string> md5Dict = new Dictionary<string, string>();
-        public void AddValue(string key, string value)
-        {
-            keyList.Add(key);
-            md5List.Add(value);
-        }
-        public void ClearMD5Dict()
-        {
-            keyList.Clear();
-            md5List.Clear();
-            md5Dict.Clear();
-        }
-        public void SlotMd5(string key, string value)
-        {
-            md5Dict[key] = value;
-        }
-        public bool TryGetMd5(string key, out string value)
-        {
-            bool result = md5Dict.TryGetValue(key, out value);
-            return result;
-        }
     }
-#endif
 }

@@ -358,6 +358,7 @@ namespace MikuLuaProfiler
 
         protected override void DoubleClickedItem(int id)
         {
+            /*
             base.DoubleClickedItem(id);
             var selectItem = FindItem(id, BuildRoot());
             string fileName = "/" + selectItem.displayName.Split(new char[] { ',' }, 2)[0].Replace(".", "/").Replace("/lua", ".lua").Trim();
@@ -365,11 +366,11 @@ namespace MikuLuaProfiler
             {
                 int line = 0;
                 int.TryParse(Regex.Match(selectItem.displayName, @"(?<=(line:))\d*(?=( ))").Value, out line);
-                LocalToLuaIDE.OnOpenAsset(fileName, line);
+                //LocalToLuaIDE.OnOpenAsset(fileName, line);
             }     
             catch
             {
-            }
+            }*/
         }
 
         public static Dictionary<string, LuaProfilerTreeViewItem> m_nodeDict = new Dictionary<string, LuaProfilerTreeViewItem>();

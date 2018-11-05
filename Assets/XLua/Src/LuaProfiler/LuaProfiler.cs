@@ -219,9 +219,9 @@ namespace MikuLuaProfiler
                 if (LuaDeepProfilerSetting.Instance.isDeepProfiler)//&& name != "chunk"
                 {
                     var utf8WithoutBom = new System.Text.UTF8Encoding(true);
-                    string fileName = name.Replace("@", "").Replace("/", ".") + LuaDeepProfilerSetting.Instance.luaExtern;
+                    string fileName = name.Replace("@", "").Replace("/", ".") + ".lua";
                     string value = utf8WithoutBom.GetString(buff);
-                    value = LuaDeepProfiler.InsertSample(value, fileName);
+                    value = Parse.InsertSample(value, fileName);
 
                     buff = utf8WithoutBom.GetBytes(value);
                     size = buff.Length;
@@ -282,97 +282,6 @@ namespace MikuLuaProfiler
         }
         #endregion
 
-        #region hook loader
-        public class LuaLoader
-        {
-
-            #region output mode
-            private static bool m_isInited = false;
-            private static readonly Dictionary<string, string> m_pathDict = new Dictionary<string, string>();
-            private static void InitPathDict()
-            {
-                if (m_isInited) return;
-                string[] paths = null;
-                m_pathDict.Clear();
-
-                LuaDeepProfilerSetting ls = LuaDeepProfilerSetting.Instance;
-                string luaPath = !ls.isDeepProfiler ? ls.luaProjectPath : ls.profilerLuaProjectPath;
-                luaPath = luaPath.Replace('\\', '/');
-
-                if (Directory.Exists(luaPath))
-                {
-                    paths = Directory.GetFiles(luaPath,"*" + LuaDeepProfilerSetting.Instance.luaExtern, SearchOption.AllDirectories);
-                }
-                if (paths == null) throw new System.Exception("lua director not exit");
-
-                for (int i = 0, imax = paths.Length; i < imax; i++)
-                {
-                    string thePath = paths[i].Replace('\\', '/');
-                    string name = Path.GetFileName(thePath);
-                    string ext = name.Split(new char[] { '.' }, 2)[1];
-
-                    string fileName = thePath.Replace(luaPath + "/", "").Replace(LuaDeepProfilerSetting.Instance.luaExtern, "").Replace("/", ".").ToLower();
-
-                    m_pathDict.Add(fileName, thePath);
-                }
-                m_isInited = true;
-            }
-            private static byte[] CustomLoader(ref string filename)
-            {
-                if (!LuaDeepProfilerSetting.Instance.isDeepProfiler)
-                {
-                    return null;
-                }
-                byte[] result = null;
-                string path = null;
-                filename = filename.ToLower();
-                path = m_pathDict[filename];
-                if (File.Exists(path))
-                {
-                    result = File.ReadAllBytes(path);
-                }
-                else
-                {
-                    throw new Exception(string.Format("{0} not exit", filename));
-                }
-
-                return result;
-            }
-
-            public void AddLoader(XLua.LuaEnv.CustomLoader loader)
-            {
-                bool isDeep = LuaDeepProfilerSetting.Instance.isDeepProfiler;
-                if (isDeep)
-                {
-                    InitPathDict();
-                    Proxy(CustomLoader);
-
-                }
-                Proxy(loader);
-            }
-            public void Proxy(XLua.LuaEnv.CustomLoader loader)
-            {
-            }
-
-            public static void AddSearcher(LuaEnv env, LuaCSFunction searcher, int index)
-            {
-                bool isDeep = LuaDeepProfilerSetting.Instance.isDeepProfiler;
-                if (isDeep)
-                {
-                    env.AddLoader(CustomLoader);
-
-                }
-                ProxySearcher(env, searcher, index);
-            }
-
-            public static void ProxySearcher(LuaEnv env, LuaCSFunction searcher, int index)
-            {
-
-            }
-            #endregion
-        }
-
-        #endregion
 
         #region hook profiler
         public class Profiler
@@ -724,15 +633,6 @@ end
 
         private static Action<Sample> m_SampleEndAction;
 
-        private static bool _stableGC = true;
-        public static bool stableGC
-        {
-            get { return _stableGC; }
-        }
-        public static void ToggleStableGC()
-        {
-            _stableGC = !_stableGC;
-        }
         private static bool isDeep
         {
             get
@@ -776,7 +676,7 @@ end
 #endif
 
 #if DEBUG
-            if (beginSampleMemoryStack.Count == 0 && _stableGC)
+            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.isDeepProfiler)
                 LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCSTOP, 0);
 
             long memoryCount = GetLuaMemory(luaState);
@@ -846,7 +746,7 @@ end
             sample.costTime = Time.realtimeSinceStartup - sample.currentTime;
             var gc = nowMemoryCount - sample.realCurrentLuaMemory;
             sample.costGC = gc > 0 ? gc : 0;
-            if (beginSampleMemoryStack.Count == 0 && _stableGC)
+            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.isDeepProfiler)
             {
                 LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCRESTART, 0);
                 LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCCOLLECT, 0);

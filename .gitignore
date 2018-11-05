@@ -33,11 +33,8 @@ build/luajit-2.1.0b2/src/luajit.exe
 build/luajit-2.1.0b2/src/luajit.exp
 build/luajit-2.1.0b2/src/luajit.lib
 
-/config.luacheckrc
-/LuaProfiler
 /Assets/LuaDeepProfilerSettings.asset
 /Assets/LuaDeepProfilerSettings.asset.meta
 /obj
 /Packages
-/Assets/LuaCheckSetting.asset.meta
-/Assets/LuaCheckSetting.asset
+/UnityPackageManager/manifest.json
