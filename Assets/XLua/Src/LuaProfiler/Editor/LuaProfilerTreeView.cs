@@ -37,11 +37,10 @@ using System;
 using System.Collections.Generic;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
-using System.Text.RegularExpressions;
 
 namespace MikuLuaProfiler
 {
-
+#if UNITY_5_6_OR_NEWER
     #region item
     [Serializable]
     //The TreeElement data class is extended to hold extra data, which you can show and edit in the front-end TreeView.
@@ -488,4 +487,5 @@ namespace MikuLuaProfiler
         }
 
     }
+#endif
 }

@@ -12,6 +12,7 @@ using UnityEditor;
 
 namespace MikuLuaProfiler
 {
+#if UNITY_5_6_OR_NEWER
     public class LuaProfilerWindow : EditorWindow
     {
         [SerializeField] TreeViewState m_TreeViewState;
@@ -138,4 +139,5 @@ namespace MikuLuaProfiler
             window.Show();
         }
     }
+#endif
 }
