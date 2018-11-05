@@ -72,6 +72,10 @@ namespace MikuLuaProfiler
         [MenuItem("Tools/LuaProfilerSetting", priority = 10)]
         public static void EditSettings()
         {
+            //string text = System.IO.File.ReadAllText("Lua/TemplateCommon.lua");
+            //text = MikuLuaProfiler.Parse.InsertSample(text, "Template");
+            //System.IO.File.WriteAllText("TemplateCommon.lua", text);
+
             Selection.activeObject = Instance;
 #if UNITY_2018_1_OR_NEWER
             EditorApplication.ExecuteMenuItem("Window/General/Inspector");

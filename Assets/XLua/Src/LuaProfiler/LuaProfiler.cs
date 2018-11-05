@@ -22,9 +22,25 @@ namespace MikuLuaProfiler
     [InitializeOnLoad]
     static class HookSetup
     {
+#if !UNITY_2017_1_OR_NEWER
+        static bool isPlaying = false;
+#endif
         static HookSetup()
         {
+#if UNITY_2017_1_OR_NEWER
             EditorApplication.playModeStateChanged += OnEditorPlaying;
+#else
+            EditorApplication.playmodeStateChanged += () =>
+            {
+
+                if (isPlaying == true && EditorApplication.isPlaying == false)
+                {
+                    LuaProfiler.SetMainLuaEnv(null);
+                }
+
+                isPlaying = EditorApplication.isPlaying;
+            };
+#endif
         }
 
         public static void OnEditorPlaying(PlayModeStateChange playModeStateChange)
@@ -32,13 +48,12 @@ namespace MikuLuaProfiler
             if (playModeStateChange == PlayModeStateChange.ExitingPlayMode)
             {
                 LuaProfiler.SetMainLuaEnv(null);
-                Uninstall();
             }
         }
 
-        #region hook
+#region hook
 
-        #region hook tostring
+#region hook tostring
         public class WeakDictionary<K, V>
         {
             readonly Dictionary<K, WeakReference> _dict;
@@ -156,7 +171,7 @@ namespace MikuLuaProfiler
 
         public class LuaDll
         {
-            #region luastring
+#region luastring
             const int MAX_WEAK_STRING = 1000;
             public static readonly WeakDictionary<long, LuaString> weakDictionary = new WeakDictionary<long, LuaString>();
             public static bool TryGetLuaString(IntPtr p, out string result)
@@ -212,7 +227,7 @@ namespace MikuLuaProfiler
                     base.Dispose(disposeManagedResources);
                 }
             }
-            #endregion
+#endregion
 
             public static int xluaL_loadbuffer(IntPtr L, byte[] buff, int size, string name)
             {
@@ -280,10 +295,10 @@ namespace MikuLuaProfiler
                 return null;
             }
         }
-        #endregion
+#endregion
 
 
-        #region hook profiler
+#region hook profiler
         public class Profiler
         {
             private static Stack<string> m_Stack = new Stack<string>();
@@ -328,9 +343,9 @@ namespace MikuLuaProfiler
             {
             }
         }
-        #endregion
+#endregion
 
-        #region do hook
+#region do hook
         private static MethodHooker beginSampeOnly;
         private static MethodHooker beginObjetSample;
         private static MethodHooker endSample;
@@ -436,9 +451,9 @@ namespace MikuLuaProfiler
 
             m_hooked = false;
         }
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 
     public class LuaProfiler
@@ -469,6 +484,11 @@ end
 ");
                     HookSetup.HookLuaFuns();
                 }
+            }
+
+            if (env == null)
+            {
+                HookSetup.Uninstall();
             }
         }
 

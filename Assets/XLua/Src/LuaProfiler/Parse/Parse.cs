@@ -4,7 +4,7 @@ using UniLua;
 
 namespace MikuLuaProfiler
 {
-    public class Parse
+    public static class Parse
     {
         #region parse
         public static string InsertSample(string value, string name)
@@ -73,7 +73,8 @@ namespace MikuLuaProfiler
 
                             if (tokenType == (int)')')
                             {
-                                l.InsertString(nextPos, "\r\nBeginMikuSample(\"" + l.Source + ",line:" + l.LineNumber + " funName:" + funName + "\")\r\n");
+                                l.InsertString(nextPos, "\r\nBeginMikuSample(\"" + l.Source 
+                                    + ",line:" + l.LineNumber + " funName:" + funName + "\")\r\n");
                                 nextPos = l.pos;
                                 break;
                             }
@@ -114,7 +115,8 @@ namespace MikuLuaProfiler
                             if (tokenType == (int)TK.END
                                 || tokenType == (int)TK.ELSEIF
                                 || tokenType == (int)TK.ELSE
-                                || tokenType == (int)TK.EOS)
+                                || tokenType == (int)TK.EOS
+                                || (l.Token is CommentToken))
                             {
                                 string returnStr = l.ReadString(insertPos, lastPos - 1); ;
 
