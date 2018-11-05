@@ -49,7 +49,6 @@ namespace MikuLuaProfiler
             set
             {
                 m_isDeepProfiler = value;
-                EditorUtility.SetDirty(this);
             }
         }
 
@@ -65,7 +64,6 @@ namespace MikuLuaProfiler
             set
             {
                 m_stableGC = value;
-                EditorUtility.SetDirty(this);
             }
         }
 

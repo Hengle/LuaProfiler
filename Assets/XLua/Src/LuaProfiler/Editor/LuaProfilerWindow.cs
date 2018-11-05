@@ -36,7 +36,6 @@ namespace MikuLuaProfiler
 
         private bool m_isStop = false;
         private bool m_isStable = true;
-        private bool m_isDeep = false;
         void DoToolbar()
         {
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -51,11 +50,11 @@ namespace MikuLuaProfiler
             #endregion
 
             #region deep
-            bool flag = GUILayout.Toggle(m_isDeep, "Deep Profiler", EditorStyles.toolbarButton, GUILayout.Height(30));
-            if (flag != m_isDeep)
+            bool flag = GUILayout.Toggle(LuaDeepProfilerSetting.Instance.isDeepProfiler,
+                "Deep Profiler", EditorStyles.toolbarButton, GUILayout.Height(30));
+            if (flag != LuaDeepProfilerSetting.Instance.isDeepProfiler)
             {
                 LuaDeepProfilerSetting.Instance.isDeepProfiler = flag;
-                m_isDeep = flag;
             }
             GUILayout.Space(5);
             #endregion
@@ -91,6 +90,7 @@ namespace MikuLuaProfiler
             bool isStable = GUILayout.Toggle(m_isStable, "Stable GC", EditorStyles.toolbarButton, GUILayout.Height(30));
             if (isStable != m_isStable)
             {
+                EditorApplication.isPlaying = false;
                 LuaDeepProfilerSetting.Instance.stableGC = isStable;
                 m_isStable = isStable;
             }

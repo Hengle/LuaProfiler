@@ -43,6 +43,7 @@ namespace MikuLuaProfiler
 #endif
         }
 
+#if UNITY_2017_1_OR_NEWER
         public static void OnEditorPlaying(PlayModeStateChange playModeStateChange)
         {
             if (playModeStateChange == PlayModeStateChange.ExitingPlayMode)
@@ -50,10 +51,11 @@ namespace MikuLuaProfiler
                 LuaProfiler.SetMainLuaEnv(null);
             }
         }
+#endif
 
-#region hook
+        #region hook
 
-#region hook tostring
+        #region hook tostring
         public class WeakDictionary<K, V>
         {
             readonly Dictionary<K, WeakReference> _dict;
@@ -497,7 +499,11 @@ end
             long result = 0;
             if (_mainEnv != null)
             {
-                result = GetLuaMemory(_mainEnv.L);
+                try
+                {
+                    result = GetLuaMemory(_mainEnv.L);
+                }
+                catch { }
             }
 
             return GetMemoryString(result);
