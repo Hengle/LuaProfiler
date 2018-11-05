@@ -1,31 +1,4 @@
 ﻿/*
-               #########                       
-              ############                     
-              #############                    
-             ##  ###########                   
-            ###  ###### #####                  
-            ### #######   ####                 
-           ###  ########## ####                
-          ####  ########### ####               
-         ####   ###########  #####             
-        #####   ### ########   #####           
-       #####   ###   ########   ######         
-      ######   ###  ###########   ######       
-     ######   #### ##############  ######      
-    #######  #####################  ######     
-    #######  ######################  ######    
-   #######  ###### #################  ######   
-   #######  ###### ###### #########   ######   
-   #######    ##  ######   ######     ######   
-   #######        ######    #####     #####    
-    ######        #####     #####     ####     
-     #####        ####      #####     ###      
-      #####       ###        ###      #        
-        ###       ###        ###               
-         ##       ###        ###                
-__________#_______####_______####______________
-
-               我们的未来没有BUG                 
 * ==============================================================================
 * Filename: LuaExport
 * Created:  2018/7/13 14:29:22
@@ -75,7 +48,15 @@ namespace MikuLuaProfiler
             }
             get
             {
-                if (Time.frameCount == _frameCount) { return _showGC; }
+                if (!UnityEditor.EditorApplication.isPlaying)
+                {
+                    return _showGC;
+                }
+
+                if (Time.frameCount == _frameCount)
+                {
+                    return _showGC;
+                }
                 else { return 0; }
             }
         }
@@ -413,6 +394,29 @@ namespace MikuLuaProfiler
             foreach (var item in rootList)
             {
                 AddOneNode(item);
+                SortChildren(sortIndex, sign, item);
+            }
+        }
+
+        private void SortChildren(int sortIndex, int sign, LuaProfilerTreeViewItem item)
+        {
+            if (item.childs != null && item.childs.Count > 0)
+            {
+                List<LuaProfilerTreeViewItem> rootList = item.childs;
+                switch (sortIndex)
+                {
+                    case 1: rootList.Sort((a, b) => { return sign * Math.Sign(a.totalMemory - b.totalMemory); }); break;
+                    case 2: rootList.Sort((a, b) => { return sign * Math.Sign(a.currentTime - b.currentTime); }); break;
+                    case 3: rootList.Sort((a, b) => { return sign * Math.Sign(a.averageTime - b.averageTime); }); break;
+                    case 4: rootList.Sort((a, b) => { return sign * Math.Sign(a.totalTime - b.totalTime); }); break;
+                    case 5: rootList.Sort((a, b) => { return sign * Math.Sign(a.showGC - b.showGC); }); break;
+                    case 6: rootList.Sort((a, b) => { return sign * Math.Sign(a.totalCallTime - b.totalCallTime); }); break;
+                    case 7: rootList.Sort((a, b) => { return sign * Math.Sign(a.frameCalls - b.frameCalls); }); break;
+                }
+                foreach (var t in rootList)
+                {
+                    SortChildren(sortIndex, sign, t);
+                }
             }
         }
 
