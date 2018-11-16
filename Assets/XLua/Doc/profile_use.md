@@ -9,3 +9,6 @@
 
 
 请在 Awake 或者Start的流程中 new LuaEnv,在变量声明处直接 new会导致性能分析器失效
+
+<br/>
+![](Assets/XLua/Doc/profiler.png)

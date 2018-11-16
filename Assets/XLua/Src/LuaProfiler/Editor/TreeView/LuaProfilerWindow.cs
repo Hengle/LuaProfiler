@@ -57,6 +57,7 @@ namespace MikuLuaProfiler
             if (flag != LuaDeepProfilerSetting.Instance.isDeepProfiler)
             {
                 LuaDeepProfilerSetting.Instance.isDeepProfiler = flag;
+                EditorApplication.isPlaying = false;
             }
             GUILayout.Space(5);
             #endregion
@@ -92,7 +93,6 @@ namespace MikuLuaProfiler
             bool isStable = GUILayout.Toggle(m_isStable, "Stable GC", EditorStyles.toolbarButton, GUILayout.Height(30));
             if (isStable != m_isStable)
             {
-                EditorApplication.isPlaying = false;
                 LuaDeepProfilerSetting.Instance.stableGC = isStable;
                 m_isStable = isStable;
             }
