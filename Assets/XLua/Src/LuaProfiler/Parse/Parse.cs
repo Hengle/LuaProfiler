@@ -127,18 +127,15 @@ namespace MikuLuaProfiler
                                 nextPos = l.pos;
                                 if (tokenType == (int)TK.END)
                                 {
-                                    if (onlyFun)
+                                    if (tokens.Count > 0)
+                                        tokens.Pop();
+                                    if (onlyFun && tokens.Count <= 0)
                                     {
                                         l.Next();
                                         lastPos = nextPos;
                                         nextPos = l.pos;
                                         return;
                                     }
-                                    else
-                                    {
-                                        tokens.Pop();
-                                    }
-
                                 }
                                 break;
                             }
