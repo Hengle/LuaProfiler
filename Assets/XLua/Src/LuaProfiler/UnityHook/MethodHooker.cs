@@ -3,7 +3,7 @@
  Author: Misaka Mikoto
  Github: https://github.com/easy66/MonoHooker
  */
-
+#if UNITY_EDITOR
 using DotNetDetour;
 using System;
 using System.Reflection;
@@ -265,3 +265,4 @@ public unsafe class MethodHooker
 
 #endregion
 }
+#endif

@@ -1,4 +1,4 @@
-﻿
+﻿#if UNITY_EDITOR
 namespace UniLua
 {
 	public static class LuaConf
@@ -125,4 +125,4 @@ namespace UniLua
 	}
 
 }
-
+#endif

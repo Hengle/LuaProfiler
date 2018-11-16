@@ -6,10 +6,9 @@
 * Purpose:  
 * ==============================================================================
 */
-
+#if UNITY_EDITOR
 namespace MikuLuaProfiler
 {
-#if UNITY_EDITOR
     using System.Collections.Generic;
     using UnityEditor;
     using UnityEngine;
@@ -81,6 +80,6 @@ namespace MikuLuaProfiler
             EditorApplication.ExecuteMenuItem("Window/Inspector");
 #endif
         }
-#endif
     }
 }
+#endif

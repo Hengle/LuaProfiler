@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System;
 
 namespace DotNetDetour
 {
@@ -873,3 +874,4 @@ namespace DotNetDetour
         }
     }
 }
+#endif

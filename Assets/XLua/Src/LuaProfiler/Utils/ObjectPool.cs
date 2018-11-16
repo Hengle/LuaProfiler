@@ -1,7 +1,7 @@
 ﻿/*
  * 对象池
  */
-
+#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -167,3 +167,4 @@ namespace MikuLuaProfiler
         private CreateFunc m_createFunc = null;
     }
 }
+#endif

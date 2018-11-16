@@ -1,4 +1,4 @@
-/*        		   
+/*
 * ==============================================================================
 * Filename: StarUp
 * Created:  2018/7/2 11:36:16
@@ -7,7 +7,7 @@
 * ==============================================================================
 */
 
-
+#if UNITY_EDITOR
 using System;
 using System.Reflection;
 using UnityEditor;
@@ -50,3 +50,4 @@ public static class Startup
         }
     }
 }
+#endif
