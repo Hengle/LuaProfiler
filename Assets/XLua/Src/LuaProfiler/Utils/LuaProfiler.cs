@@ -239,6 +239,8 @@ namespace MikuLuaProfiler
                     string value = utf8WithoutBom.GetString(buff);
                     value = Parse.InsertSample(value, fileName);
 
+                    //System.IO.File.WriteAllText(fileName, value);
+
                     buff = utf8WithoutBom.GetBytes(value);
                     size = buff.Length;
                 }
@@ -701,7 +703,7 @@ end
 #endif
 
 #if DEBUG
-            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.isDeepProfiler)
+            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.stableGC)
                 LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCSTOP, 0);
 
             long memoryCount = GetLuaMemory(luaState);
@@ -771,7 +773,7 @@ end
             sample.costTime = Time.realtimeSinceStartup - sample.currentTime;
             var gc = nowMemoryCount - sample.realCurrentLuaMemory;
             sample.costGC = gc > 0 ? gc : 0;
-            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.isDeepProfiler)
+            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.stableGC)
             {
                 LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCRESTART, 0);
                 LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCCOLLECT, 0);
