@@ -37,7 +37,7 @@ namespace MikuLuaProfiler
         }
 
         private bool m_isStop = false;
-        private bool m_isStable = true;
+        private bool m_isStable = false;
         void DoToolbar()
         {
             GUILayout.BeginHorizontal(EditorStyles.toolbar);

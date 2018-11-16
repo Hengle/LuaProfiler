@@ -53,7 +53,7 @@ namespace MikuLuaProfiler
 
 
         [SerializeField]
-        private bool m_stableGC = true;
+        private bool m_stableGC = false;
         public bool stableGC
         {
             get
