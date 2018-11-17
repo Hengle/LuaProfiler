@@ -19,4 +19,4 @@
 
 ---
 有什么BUG可以联系QQ 345036769，觉得好用可以捐赠点小钱
-![](Assets/XLua/Doc/zfb.jpg)
+![](Assets/XLua/Doc/zfb.png)
