@@ -17,15 +17,15 @@ ToLua取消SLuaHookSetup 第10行的注释
 点击 "Window->Lua Profiler Window"在弹出窗口上打开 Deep Profiler,然后正常进入游戏即可
 <br/>
 效果如下
-![](Assets/XLua/Doc/profiler.png)
+![](doc/profiler.png)
 <br/>
 #### 小tips
 如果GC显示的不平稳，可以stop gc
 
 ### 使用项目
-![](Assets/XLua/Doc/ljjc.jpg)
+![](doc/ljjc.jpg)
 
 ---
 有什么BUG可以联系QQ 345036769，觉得好用可以捐赠点小钱
 <br/>
-![](Assets/XLua/Doc/zfb.png)
+![](doc/zfb.png)
