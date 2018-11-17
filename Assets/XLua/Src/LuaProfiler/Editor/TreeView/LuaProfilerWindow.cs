@@ -37,7 +37,6 @@ namespace MikuLuaProfiler
         }
 
         private bool m_isStop = false;
-        private bool m_isStable = false;
         void DoToolbar()
         {
             GUILayout.BeginHorizontal(EditorStyles.toolbar);
@@ -85,16 +84,6 @@ namespace MikuLuaProfiler
                     }
                     m_isStop = false;
                 }
-            }
-            GUILayout.Space(5);
-            #endregion
-
-            #region stable
-            bool isStable = GUILayout.Toggle(m_isStable, "Stable GC", EditorStyles.toolbarButton, GUILayout.Height(30));
-            if (isStable != m_isStable)
-            {
-                LuaDeepProfilerSetting.Instance.stableGC = isStable;
-                m_isStable = isStable;
             }
             GUILayout.Space(5);
             #endregion

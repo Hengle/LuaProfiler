@@ -703,9 +703,6 @@ end
 #endif
 
 #if DEBUG
-            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.stableGC)
-                LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCSTOP, 0);
-
             long memoryCount = GetLuaMemory(luaState);
             Sample sample = Sample.Create(Time.realtimeSinceStartup, memoryCount, name);
 
@@ -773,12 +770,6 @@ end
             sample.costTime = Time.realtimeSinceStartup - sample.currentTime;
             var gc = nowMemoryCount - sample.realCurrentLuaMemory;
             sample.costGC = gc > 0 ? gc : 0;
-            if (beginSampleMemoryStack.Count == 0 && LuaDeepProfilerSetting.Instance.stableGC)
-            {
-                LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCRESTART, 0);
-                LuaLib.lua_gc(luaState, LuaGCOptions.LUA_GCCOLLECT, 0);
-            }
-
 
             if (m_SampleEndAction != null && beginSampleMemoryStack.Count == 0)
             {

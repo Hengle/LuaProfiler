@@ -51,21 +51,6 @@ namespace MikuLuaProfiler
             }
         }
 
-
-        [SerializeField]
-        private bool m_stableGC = false;
-        public bool stableGC
-        {
-            get
-            {
-                return m_stableGC;
-            }
-            set
-            {
-                m_stableGC = value;
-            }
-        }
-
         [MenuItem("Tools/LuaProfilerSetting", priority = 10)]
         public static void EditSettings()
         {
