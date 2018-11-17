@@ -6,7 +6,9 @@
 把LuaProfiler文件夹Copy到Assets 非Plugin、Editor目录下。
 <br/>
 XLua取消XLuaHookSetup 第10行的注释
+<br/>
 SLua取消SLuaHookSetup 第10行的注释
+<br/>
 ToLua取消SLuaHookSetup 第10行的注释
 <br/>
 当然你也可以在对应版本的Lua里面把LuaProfiler文件夹导入到你的工程目录中
