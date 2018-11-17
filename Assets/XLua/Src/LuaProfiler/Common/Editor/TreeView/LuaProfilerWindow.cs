@@ -9,6 +9,7 @@
 using UnityEngine;
 using UnityEditor.IMGUI.Controls;
 using UnityEditor;
+using System;
 
 namespace MikuLuaProfiler
 {
@@ -68,20 +69,12 @@ namespace MikuLuaProfiler
             {
                 if (isStop)
                 {
-                    var env = LuaProfiler.mainEnv;
-                    if (env != null)
-                    {
-                        env.StopGc();
-                    }
+                    LuaProfiler.StopGC();
                     m_isStop = true;
                 }
                 else
                 {
-                    var env = LuaProfiler.mainEnv;
-                    if (env != null)
-                    {
-                        env.RestartGc();
-                    }
+                    LuaProfiler.ResumeGC();
                     m_isStop = false;
                 }
             }
@@ -89,14 +82,10 @@ namespace MikuLuaProfiler
             #endregion
 
             #region run gc
-            bool isRunGC = GUILayout.Button("Full GC", EditorStyles.toolbarButton, GUILayout.Height(30));
+            bool isRunGC = GUILayout.Button("Run GC", EditorStyles.toolbarButton, GUILayout.Height(30));
             if (isRunGC)
             {
-                var env = LuaProfiler.mainEnv;
-                if (env != null)
-                {
-                    env.FullGc();
-                }
+                LuaProfiler.RunGC();
             }
             GUILayout.Space(20);
             GUILayout.FlexibleSpace();
