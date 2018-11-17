@@ -2,8 +2,14 @@
 
 
 ### 部署安装
-
-直接把Src目录下的LuaProfiler文件夹导入到项目工程中对应目录即可，非常简单粗暴
+目前支持XLua、SLua、ToLua
+把LuaProfiler文件夹Copy到Assets 非Plugin、Editor目录下。
+<br/>
+XLua取消XLuaHookSetup 第10行的注释
+SLua取消SLuaHookSetup 第10行的注释
+ToLua取消SLuaHookSetup 第10行的注释
+<br/>
+当然你也可以在对应版本的Lua里面把LuaProfiler文件夹导入到你的工程目录中
 
 ### 使用教程
 点击 "Window->Lua Profiler Window"在弹出窗口上打开 Deep Profiler,然后正常进入游戏即可
