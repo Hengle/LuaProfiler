@@ -69,12 +69,12 @@ namespace MikuLuaProfiler
             {
                 if (isStop)
                 {
-                    LuaProfiler.StopGC();
+                    LuaLib.StopGC();
                     m_isStop = true;
                 }
                 else
                 {
-                    LuaProfiler.ResumeGC();
+                    LuaLib.ResumeGC();
                     m_isStop = false;
                 }
             }
@@ -85,7 +85,7 @@ namespace MikuLuaProfiler
             bool isRunGC = GUILayout.Button("Run GC", EditorStyles.toolbarButton, GUILayout.Height(30));
             if (isRunGC)
             {
-                LuaProfiler.RunGC();
+                LuaLib.RunGC();
             }
             GUILayout.Space(20);
             GUILayout.FlexibleSpace();

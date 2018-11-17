@@ -6,8 +6,6 @@ using UnityEngine;
 #if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
 #endif
-using XLua;
-using LuaDLL = MikuLuaProfiler.LuaLib;
 using UnityEditorInternal;
 
 namespace MikuLuaProfiler
@@ -34,47 +32,12 @@ namespace MikuLuaProfiler
             {
                 try
                 {
-                    result = GetLuaMemory(mainL);
+                    result = LuaLib.GetLuaMemory(mainL);
                 }
                 catch { }
             }
 
             return GetMemoryString(result);
-        }
-
-        public static void RunGC()
-        {
-            var env = mainL;
-            if (env != IntPtr.Zero)
-            {
-                LuaDLL.lua_gc(env, LuaGCOptions.LUA_GCCOLLECT, 0);
-            }
-        }
-        public static void StopGC()
-        {
-            var env = mainL;
-            if (env != IntPtr.Zero)
-            {
-                LuaDLL.lua_gc(env, LuaGCOptions.LUA_GCSTOP, 0);
-            }
-        }
-        public static void ResumeGC()
-        {
-            var env = mainL;
-            if (env != IntPtr.Zero)
-            {
-                LuaDLL.lua_gc(env, LuaGCOptions.LUA_GCRESTART, 0);
-            }
-        }
-
-        public static long GetLuaMemory(IntPtr luaState)
-        {
-            long result = 0;
-
-            result = LuaDLL.lua_gc(luaState, LuaGCOptions.LUA_GCCOUNT, 0);
-            result = result * 1024 + LuaDLL.lua_gc(luaState, LuaGCOptions.LUA_GCCOUNTB, 0);
-
-            return result;
         }
 
         public class Sample
@@ -258,7 +221,7 @@ namespace MikuLuaProfiler
             }
 
 #if DEBUG
-            long memoryCount = GetLuaMemory(luaState);
+            long memoryCount = LuaLib.GetLuaMemory(luaState);
             Sample sample = Sample.Create(Time.realtimeSinceStartup, memoryCount, name);
 
             beginSampleMemoryStack.Add(sample);
@@ -300,7 +263,7 @@ namespace MikuLuaProfiler
             Sample sample = beginSampleMemoryStack[beginSampleMemoryStack.Count - 1];
             long oldMemoryCount = sample.currentLuaMemory;
             beginSampleMemoryStack.RemoveAt(count - 1);
-            long nowMemoryCount = GetLuaMemory(luaState);
+            long nowMemoryCount = LuaLib.GetLuaMemory(luaState);
             sample.fahter = count > 1 ? beginSampleMemoryStack[count - 2] : null;
 
             if (!isDeep)
