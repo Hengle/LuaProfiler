@@ -6,8 +6,8 @@
 * Purpose:  
 * ==============================================================================
 */
-#define XLUA
 
+#define XLUA
 #if XLUA
 
 #if UNITY_EDITOR
@@ -20,9 +20,48 @@ using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using XLua;
+using LuaState = XLua.LuaEnv;
 using LuaDLL = XLua.LuaDLL.Lua;
 
 namespace MikuLuaProfiler {
+
+    public class LuaLib
+    {
+        public static void RunGC()
+        {
+            var env = LuaProfiler.mainL;
+            if (env != IntPtr.Zero)
+            {
+                LuaDLL.lua_gc(env, LuaGCOptions.LUA_GCCOLLECT, 0);
+            }
+        }
+        public static void StopGC()
+        {
+            var env = LuaProfiler.mainL;
+            if (env != IntPtr.Zero)
+            {
+                LuaDLL.lua_gc(env, LuaGCOptions.LUA_GCSTOP, 0);
+            }
+        }
+        public static void ResumeGC()
+        {
+            var env = LuaProfiler.mainL;
+            if (env != IntPtr.Zero)
+            {
+                LuaDLL.lua_gc(env, LuaGCOptions.LUA_GCRESTART, 0);
+            }
+        }
+
+        public static long GetLuaMemory(IntPtr luaState)
+        {
+            long result = 0;
+
+            result = LuaDLL.lua_gc(luaState, LuaGCOptions.LUA_GCCOUNT, 0);
+            result = result * 1024 + LuaDLL.lua_gc(luaState, LuaGCOptions.LUA_GCCOUNTB, 0);
+
+            return result;
+        }
+    }
 
     [InitializeOnLoad]
     public static class Startup
@@ -58,12 +97,12 @@ namespace MikuLuaProfiler {
 
         public static class LuaEnvReplace
         {
-            public static void Ctor(LuaEnv env)
+            public static void Ctor(LuaState env)
             {
                 Proxy(env);
                 MikuLuaProfiler.HookSetup.SetMainLuaEnv(env);
             }
-            public static void Proxy(LuaEnv env)
+            public static void Proxy(LuaState env)
             {
             }
 
@@ -106,7 +145,7 @@ namespace MikuLuaProfiler {
         }
 
 
-        public static void SetMainLuaEnv(LuaEnv env)
+        public static void SetMainLuaEnv(LuaState env)
         {
             if (LuaDeepProfilerSetting.Instance.isDeepProfiler)
             {
@@ -142,13 +181,13 @@ end
         }
 #endif
 
-        #region hook
+#region hook
 
-        #region hook tostring
+#region hook tostring
 
         public class LuaDll
         {
-            #region luastring
+#region luastring
             public static readonly Dictionary<long, string> stringDict = new Dictionary<long, string>();
             public static bool TryGetLuaString(IntPtr p, out string result)
             {
@@ -164,7 +203,7 @@ end
                 LuaDLL.lua_settop(L, oldTop);
                 stringDict[(long)strPoint] = s;
             }
-            #endregion
+#endregion
 
             public static int xluaL_loadbuffer(IntPtr L, byte[] buff, int size, string name)
             {
@@ -234,10 +273,10 @@ end
                 return null;
             }
         }
-        #endregion
+#endregion
 
 
-        #region hook profiler
+#region hook profiler
         public class Profiler
         {
             private static Stack<string> m_Stack = new Stack<string>();
@@ -282,9 +321,9 @@ end
             {
             }
         }
-        #endregion
+#endregion
 
-        #region do hook
+#region do hook
         private static MethodHooker beginSampeOnly;
         private static MethodHooker beginObjetSample;
         private static MethodHooker endSample;
@@ -371,18 +410,9 @@ end
 
             m_hooked = false;
         }
-        #endregion
+#endregion
 
-        #endregion
-    }
-
-    public class LuaLib
-    {
-        public static int lua_gc(IntPtr L, LuaGCOptions what, int data)
-        {
-            return LuaDLL.lua_gc(L, what, data);
-        }
-
+#endregion
     }
 }
 #endif
