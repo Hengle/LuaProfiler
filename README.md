@@ -5,11 +5,11 @@
 目前支持XLua、SLua、ToLua
 把LuaProfiler文件夹Copy到Assets 非Plugin、Editor目录下。
 <br/>
-XLua取消XLuaHookSetup 第10行的注释
+XLua取消 "LuaProfiler/HookSetup/XLuaHookSetup.cs" 第10行的注释
 <br/>
-SLua取消SLuaHookSetup 第10行的注释
+SLua取消 "LuaProfiler/HookSetup/SLuaHookSetup.cs" 第10行的注释
 <br/>
-ToLua取消SLuaHookSetup 第10行的注释
+ToLua取消 "LuaProfiler/HookSetup/SLuaHookSetup.cs" 第10行的注释
 <br/>
 当然你也可以在对应版本的Lua里面把LuaProfiler文件夹导入到你的工程目录中
 
