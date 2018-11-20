@@ -32,13 +32,13 @@ ToLua取消 "LuaProfiler/HookSetup/SLuaHookSetup.cs" 第10行的注释
 有什么BUG可以联系加群：882425563
 
 ---
-最后感谢Misaka Mikoto提供的MonoHook库
-云风团队提供的Unilua
+### 最后感谢
 
-耐心测试的成员：
-<br/>
-_Jay_
-<br/>
-_ZhangDi_
-<br/>
-_阳光儿_
+**Misaka Mikoto**提供的MonoHook库<br/>
+**云风团队**提供的Unilua<br/>
+
+耐心测试的成员：<br/>
+**Jay**<br/>
+
+**ZhangDi**<br/>
+**阳光儿**
