@@ -3,6 +3,7 @@
 
 ### 部署安装
 目前支持XLua、SLua、ToLua
+<br/>
 把LuaProfiler文件夹Copy到Assets 非Plugin、Editor目录下。
 <br/>
 XLua取消 "LuaProfiler/HookSetup/XLuaHookSetup.cs" 第10行的注释
@@ -25,7 +26,16 @@ ToLua取消 "LuaProfiler/HookSetup/SLuaHookSetup.cs" 第10行的注释
 ### 使用项目
 ![](doc/ljjc.jpg)
 
+###
+
 ---
-有什么BUG可以联系QQ 345036769，觉得好用可以捐赠点小钱
-<br/>
-![](doc/zfb.png)
+有什么BUG可以联系加群：882425563
+
+---
+最后感谢Misaka Mikoto提供的MonoHook库
+云风团队提供的Unilua
+
+耐心测试的成员：
+Jay
+ZhangDi
+阳光儿
