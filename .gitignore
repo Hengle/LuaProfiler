@@ -17,8 +17,8 @@ UnityVS
 *.o
 /build/*/*.a
 
-ToLua/Assets/Source/Generate/*Wrap.cs
-ToLua/Assets/Source/Generate/*Wrap.cs.meta
+ToLua/Assets/Source/Generate/*Wrap*
+ToLua/Assets/Source/Generate/*Wrap*
 /Assets/LuaDeepProfilerSettings.asset
 /Assets/LuaDeepProfilerSettings.asset.meta
 obj
